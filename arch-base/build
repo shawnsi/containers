@@ -9,11 +9,12 @@ if [ ! -f $TARBALL ]; then
 fi
 
 ARCHROOT=root.x86_64
+DOCKERTARBALL=archlinux-docker-$RELEASE-x86_64.tar.gz
 
-if [ ! -d $ARCHROOT ]; then
+if [ ! -d $DOCKERTARBALL ]; then
 	echo ' => Building docker formatted tarball'
 	fakeroot tar xf $TARBALL
-	fakeroot tar -czf archlinux-docker-$RELEASE-x86_64.tar.gz -C $ARCHROOT . /dev/{console,null,random,urandom,zero}
+	fakeroot tar -czf $DOCKERTARBALL -C $ARCHROOT . /dev/{console,null,random,urandom,zero}
 	rm -fr $ARCHROOT
 fi
 
