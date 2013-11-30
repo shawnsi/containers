@@ -1,0 +1,27 @@
+#!/bin/bash
+
+RELEASE=$(egrep -o '[0-9]{4}.[0-9]{2}.[0-9]{2}' Dockerfile )
+
+if [ -z $RELEASE ]; then
+	echo 'Must pass Archlinux release as first argument'
+	exit 1
+fi
+
+TARBALL="archlinux-bootstrap-$RELEASE-x86_64.tar.gz"
+
+if [ ! -f $TARBALL ]; then
+	echo ' => Grabbing upstream tarball'
+	curl -O http://ord.mirror.rackspace.com/archlinux/iso/$RELEASE/$TARBALL
+fi
+
+ARCHROOT=root.x86_64
+
+if [ ! -d $ARCHROOT ]; then
+	echo ' => Building docker formatted tarball'
+	fakeroot tar xf $TARBALL
+	fakeroot tar -czf archlinux-docker-$RELEASE-x86_64.tar.gz -C $ARCHROOT . /dev/{console,null,random,urandom,zero}
+	rm -fr $ARCHROOT
+fi
+
+echo ' => Building docker container'
+docker build -t ssiefkas/arch-base:$RELEASE .
